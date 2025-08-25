@@ -3,8 +3,6 @@ package services
 import (
 	"context"
 	"encoding/json"
-	"github.com/adrg/sysfont"
-	runtime2 "github.com/wailsapp/wails/v2/pkg/runtime"
 	"net/http"
 	"os"
 	"sort"
@@ -16,6 +14,9 @@ import (
 	"tinyrdm/backend/utils/coll"
 	convutil "tinyrdm/backend/utils/convert"
 	sliceutil "tinyrdm/backend/utils/slice"
+
+	"github.com/adrg/sysfont"
+	runtime2 "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type preferencesService struct {
@@ -238,6 +239,15 @@ type upgradeInfo struct {
 }
 
 func (p *preferencesService) CheckForUpdate() (resp types.JSResp) {
+	resp.Success = true
+	resp.Data = map[string]any{
+		"version":       "v0.0.0",
+		"latest":        "v0.0.0",
+		"description":   "",
+		"download_page": "",
+		"sponsor":       "",
+	}
+	return
 	// request latest version
 	//res, err := http.Get("https://api.github.com/repos/tiny-craft/tiny-rdm/releases/latest")
 	res, err := http.Get("https://redis.tinycraft.cc/client_version.json")
