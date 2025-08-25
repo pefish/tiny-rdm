@@ -1,5 +1,18 @@
-import { defineStore } from 'pinia'
+import { BrowserTabType } from '@/consts/browser_tab_type.js'
+import { ConnectionType } from '@/consts/connection_type.js'
+import { KeyViewType } from '@/consts/key_view_type.js'
+import { decodeTypes, formatTypes } from '@/consts/value_view_type.js'
+import { RedisDatabaseItem } from '@/objects/redisDatabaseItem.js'
+import { RedisNodeItem } from '@/objects/redisNodeItem.js'
+import { RedisServerState } from '@/objects/redisServerState.js'
+import { isRedisGlob } from '@/utils/glob_pattern.js'
+import { i18nGlobal } from '@/utils/i18n.js'
+import { nativeRedisKey } from '@/utils/key_convert.js'
+import { timeout } from '@/utils/promise.js'
 import { endsWith, get, isEmpty, join, map, now, size, slice, split, startsWith } from 'lodash'
+import { defineStore } from 'pinia'
+import useConnectionStore from 'stores/connections.js'
+import useTabStore from 'stores/tab.js'
 import {
     AddHashField,
     AddListItem,
@@ -38,20 +51,7 @@ import {
     UpdateSetItem,
     UpdateZSetValue,
 } from 'wailsjs/go/services/browserService.js'
-import useTabStore from 'stores/tab.js'
-import { nativeRedisKey } from '@/utils/key_convert.js'
-import { BrowserTabType } from '@/consts/browser_tab_type.js'
-import { KeyViewType } from '@/consts/key_view_type.js'
-import { ConnectionType } from '@/consts/connection_type.js'
-import useConnectionStore from 'stores/connections.js'
-import { decodeTypes, formatTypes } from '@/consts/value_view_type.js'
-import { isRedisGlob } from '@/utils/glob_pattern.js'
-import { i18nGlobal } from '@/utils/i18n.js'
 import { EventsEmit, EventsOn } from 'wailsjs/runtime/runtime.js'
-import { RedisNodeItem } from '@/objects/redisNodeItem.js'
-import { RedisServerState } from '@/objects/redisServerState.js'
-import { RedisDatabaseItem } from '@/objects/redisDatabaseItem.js'
-import { timeout } from '@/utils/promise.js'
 
 const useBrowserStore = defineStore('browser', {
     /**
@@ -679,6 +679,15 @@ const useBrowserStore = defineStore('browser', {
                 serverInst.tidyNode('')
             }
             return end
+        },
+
+        async clearKeys(server) {
+            /** @type RedisServerState **/
+            const serverInst = this.servers[server]
+            if (serverInst != null) {
+                serverInst.nodeMap.clear()
+            }
+            return
         },
 
         /**

@@ -1,9 +1,9 @@
 <script setup>
-import { computed, nextTick, reactive } from 'vue'
-import { debounce, isEmpty, trim } from 'lodash'
-import { NButton, NInput } from 'naive-ui'
 import IconButton from '@/components/common/IconButton.vue'
 import SpellCheck from '@/components/icons/SpellCheck.vue'
+import { debounce, isEmpty, trim } from 'lodash'
+import { NButton, NInput } from 'naive-ui'
+import { computed, nextTick, reactive } from 'vue'
 
 const props = defineProps({
     fullSearchIcon: {
@@ -55,12 +55,28 @@ const onExactChecked = () => {
     }
 }
 
+const searchHistory = reactive([
+    // { label: 'history1', key: 'history1' },
+    // { label: 'history2', key: 'history2' },
+])
+
+const handleSelectHistory = (value) => {
+    console.log('select history', value)
+    inputData.match = value
+    inputData.filter = ''
+    emit('matchChanged', inputData.match, '', inputData.exact)
+}
+
 const onFullSearch = () => {
     inputData.filter = trim(inputData.filter)
     if (!isEmpty(inputData.filter)) {
         inputData.match = inputData.filter
         inputData.filter = ''
         emit('matchChanged', inputData.match, inputData.filter, inputData.exact)
+    }
+    searchHistory.push({ label: inputData.match, key: inputData.match })
+    if (searchHistory.length > 20) {
+        searchHistory.shift()
     }
 }
 
@@ -102,55 +118,56 @@ defineExpose({
 <template>
     <n-input-group style="overflow: hidden">
         <slot name="prepend" />
-        <n-input
-            v-model:value="inputData.filter"
-            :placeholder="$t('interface.filter')"
-            :size="props.small ? 'small' : ''"
-            :theme-overrides="{ paddingSmall: '0 3px', paddingMedium: '0 6px' }"
-            clearable
-            @clear="onClearFilter"
-            @input="onInput"
-            @keyup.enter="onFullSearch">
-            <template #prefix>
-                <slot name="prefix" />
-                <n-tooltip v-if="hasMatch" placement="bottom">
-                    <template #trigger>
-                        <n-tag closable size="small" @close="onClearMatch" @dblclick="onUpdateMatch">
-                            {{ inputData.match }}
-                        </n-tag>
-                    </template>
-                    {{
-                        $t('interface.full_search_result', {
-                            pattern: props.useGlob ? inputData.match : '*' + inputData.match + '*',
-                        })
-                    }}
-                </n-tooltip>
-            </template>
-            <template #suffix>
-                <template v-if="props.useGlob">
-                    <n-tooltip placement="bottom" trigger="hover">
+        <n-dropdown trigger="click" :options="searchHistory" @select="handleSelectHistory">
+            <n-input
+                v-model:value="inputData.filter"
+                :placeholder="$t('interface.filter')"
+                :size="props.small ? 'small' : ''"
+                :theme-overrides="{ paddingSmall: '0 3px', paddingMedium: '0 6px' }"
+                clearable
+                @clear="onClearFilter"
+                @input="onInput"
+                @keyup.enter="onFullSearch">
+                <template #prefix>
+                    <slot name="prefix" />
+                    <n-tooltip v-if="hasMatch" placement="bottom">
                         <template #trigger>
-                            <n-tag
-                                v-model:checked="inputData.exact"
-                                :checkable="true"
-                                :type="props.exact ? 'primary' : 'default'"
-                                size="small"
-                                strong
-                                style="padding: 0 5px"
-                                @updateChecked="onExactChecked">
-                                <n-icon :size="14">
-                                    <spell-check :stroke-width="2" />
-                                </n-icon>
+                            <n-tag closable size="small" @close="onClearMatch" @dblclick="onUpdateMatch">
+                                {{ inputData.match }}
                             </n-tag>
                         </template>
-                        <div class="text-block" style="max-width: 600px">
-                            {{ $t('dialogue.filter.exact_match_tip') }}
-                        </div>
+                        {{
+                            $t('interface.full_search_result', {
+                                pattern: props.useGlob ? inputData.match : '*' + inputData.match + '*',
+                            })
+                        }}
                     </n-tooltip>
                 </template>
-            </template>
-        </n-input>
-
+                <template #suffix>
+                    <template v-if="props.useGlob">
+                        <n-tooltip placement="bottom" trigger="hover">
+                            <template #trigger>
+                                <n-tag
+                                    v-model:checked="inputData.exact"
+                                    :checkable="true"
+                                    :type="props.exact ? 'primary' : 'default'"
+                                    size="small"
+                                    strong
+                                    style="padding: 0 5px"
+                                    @updateChecked="onExactChecked">
+                                    <n-icon :size="14">
+                                        <spell-check :stroke-width="2" />
+                                    </n-icon>
+                                </n-tag>
+                            </template>
+                            <div class="text-block" style="max-width: 600px">
+                                {{ $t('dialogue.filter.exact_match_tip') }}
+                            </div>
+                        </n-tooltip>
+                    </template>
+                </template>
+            </n-input>
+        </n-dropdown>
         <icon-button
             v-if="props.fullSearchIcon"
             :disabled="hasMatch && !hasFilter"

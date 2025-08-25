@@ -1,8 +1,8 @@
 <script setup>
-import { computed, reactive, ref, watchEffect } from 'vue'
-import useDialog from 'stores/dialog'
 import { types } from '@/consts/support_redis_type.js'
 import useBrowserStore from 'stores/browser.js'
+import useDialog from 'stores/dialog'
+import { computed, reactive, ref, watchEffect } from 'vue'
 
 const filterForm = reactive({
     server: '',

@@ -220,8 +220,8 @@ const handleSelectDB = async (db) => {
         await nextTick()
         await connectionStore.saveLastDB(props.server, db)
         tabStore.upsertTab({ server: props.server, db, clearValue: true })
-        fullyLoaded.value = await browserStore.loadMoreKeys(props.server, db)
-        browserTreeRef.value?.refreshTree()
+        // fullyLoaded.value = await browserStore.loadMoreKeys(props.server, db)
+        // browserTreeRef.value?.refreshTree()
         tabStore.setSelectedKeys(props.server)
     } catch (e) {
         $message.error(e.message)
@@ -245,11 +245,16 @@ const onFilterInput = (val, exact) => {
     filterForm.exact = exact
 }
 
-const onMatchInput = (matchVal, filterVal, exact) => {
-    filterForm.pattern = matchVal
-    filterForm.filter = filterVal
-    filterForm.exact = exact
-    onReload()
+const onMatchInput = async (matchVal, filterVal, exact) => {
+    console.log('onMatchInput input', matchVal, filterVal, exact)
+    if (matchVal !== '') {
+        filterForm.pattern = matchVal
+        filterForm.filter = filterVal
+        filterForm.exact = exact
+        onReload()
+    } else {
+        await browserStore.clearKeys(props.server)
+    }
 }
 
 const onSelectOptions = (select) => {
@@ -281,7 +286,7 @@ const onSelectOptions = (select) => {
     }
 }
 
-onMounted(() => onReload())
+onMounted(() => {})
 
 watch(
     () => browserStore.getReloadKey(props.server),
