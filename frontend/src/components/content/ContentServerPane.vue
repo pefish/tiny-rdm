@@ -1,19 +1,15 @@
 <script setup>
-import { computed } from 'vue'
 import AddLink from '@/components/icons/AddLink.vue'
-import useDialogStore from 'stores/dialog.js'
+import { find } from 'lodash'
 import { NButton, useThemeVars } from 'naive-ui'
-import { BrowserOpenURL } from 'wailsjs/runtime/runtime.js'
-import { find, includes, isEmpty } from 'lodash'
+import useDialogStore from 'stores/dialog.js'
 import usePreferencesStore from 'stores/preferences.js'
+import { computed } from 'vue'
+import { BrowserOpenURL } from 'wailsjs/runtime/runtime.js'
 
 const themeVars = useThemeVars()
 const dialogStore = useDialogStore()
 const prefStore = usePreferencesStore()
-
-const onOpenSponsor = (link) => {
-    BrowserOpenURL(link)
-}
 
 const openBanner = (link) => {
     BrowserOpenURL(link)
@@ -23,19 +19,6 @@ const skipBanner = () => {
     // Show again after 30 days
     localStorage.setItem('banner_next_time', Date.now() + 30 * 24 * 60 * 60 * 1000)
 }
-
-const sponsorAd = computed(() => {
-    try {
-        const content = localStorage.getItem('sponsor_ad')
-        const ads = JSON.parse(content)
-        const ad = find(ads, ({ region }) => {
-            return isEmpty(region) || includes(region, prefStore.currentLanguage)
-        })
-        return ad || null
-    } catch {
-        return null
-    }
-})
 
 const banner = computed(() => {
     try {
@@ -95,10 +78,6 @@ const banner = computed(() => {
                 </n-button>
             </template>
         </n-empty>
-
-        <n-button v-if="sponsorAd != null" class="sponsor-ad" style="" text @click="onOpenSponsor(sponsorAd.link)">
-            {{ sponsorAd.name }}
-        </n-button>
     </div>
 </template>
 

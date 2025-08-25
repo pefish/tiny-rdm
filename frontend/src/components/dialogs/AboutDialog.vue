@@ -1,10 +1,10 @@
 <script setup>
 import iconUrl from '@/assets/images/icon.png'
-import useDialog from 'stores/dialog.js'
 import { useThemeVars } from 'naive-ui'
-import { BrowserOpenURL } from 'wailsjs/runtime/runtime.js'
-import { GetAppVersion } from 'wailsjs/go/services/preferencesService.js'
+import useDialog from 'stores/dialog.js'
 import { onMounted, ref } from 'vue'
+import { GetAppVersion } from 'wailsjs/go/services/preferencesService.js'
+import { BrowserOpenURL } from 'wailsjs/runtime/runtime.js'
 
 const themeVars = useThemeVars()
 const dialogStore = useDialog()
@@ -17,7 +17,7 @@ onMounted(() => {
 })
 
 const onOpenSource = () => {
-    BrowserOpenURL('https://github.com/tiny-craft/tiny-rdm')
+    BrowserOpenURL('https://github.com/pefish/tiny-rdm')
 }
 
 const onOpenWebsite = () => {

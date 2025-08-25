@@ -1,23 +1,21 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { NIcon, useThemeVars } from 'naive-ui'
-import Database from '@/components/icons/Database.vue'
-import Server from '@/components/icons/Server.vue'
+import bilibiliUrl from '@/assets/images/bilibili_official.png'
+import wechatUrl from '@/assets/images/wechat_official.png'
 import IconButton from '@/components/common/IconButton.vue'
 import Config from '@/components/icons/Config.vue'
-import useDialogStore from 'stores/dialog.js'
+import Database from '@/components/icons/Database.vue'
 import Github from '@/components/icons/Github.vue'
-import { BrowserOpenURL } from 'wailsjs/runtime/runtime.js'
-import usePreferencesStore from 'stores/preferences.js'
 import Record from '@/components/icons/Record.vue'
-import { extraTheme } from '@/utils/extra_theme.js'
-import useBrowserStore from 'stores/browser.js'
-import { useRender } from '@/utils/render.js'
-import wechatUrl from '@/assets/images/wechat_official.png'
-import bilibiliUrl from '@/assets/images/bilibili_official.png'
-import QRCode from '@/components/icons/QRCode.vue'
-import Twitter from '@/components/icons/Twitter.vue'
+import Server from '@/components/icons/Server.vue'
 import { trackEvent } from '@/utils/analytics.js'
+import { extraTheme } from '@/utils/extra_theme.js'
+import { useRender } from '@/utils/render.js'
+import { NIcon, useThemeVars } from 'naive-ui'
+import useBrowserStore from 'stores/browser.js'
+import useDialogStore from 'stores/dialog.js'
+import usePreferencesStore from 'stores/preferences.js'
+import { computed, ref } from 'vue'
+import { BrowserOpenURL } from 'wailsjs/runtime/runtime.js'
 
 const themeVars = useThemeVars()
 const render = useRender()
@@ -106,7 +104,7 @@ const onSelectPreferenceMenu = (key) => {
             prefStore.checkForUpdate(true)
             break
         case 'report':
-            BrowserOpenURL('https://github.com/tiny-craft/tiny-rdm/issues')
+            BrowserOpenURL('https://github.com/pefish/tiny-rdm/issues')
             break
         case 'help':
             if (prefStore.currentLanguage === 'zh') {
@@ -133,7 +131,7 @@ const openX = () => {
 
 const openGithub = () => {
     trackEvent('open', { target: 'github' })
-    BrowserOpenURL('https://github.com/tiny-craft/tiny-rdm')
+    BrowserOpenURL('https://github.com/pefish/tiny-rdm')
 }
 
 const exThemeVars = computed(() => {
@@ -175,21 +173,6 @@ const exThemeVars = computed(() => {
                 @select="onSelectPreferenceMenu">
                 <icon-button :icon="Config" :size="iconSize" :stroke-width="3" />
             </n-dropdown>
-            <icon-button
-                v-if="prefStore.currentLanguage === 'zh'"
-                :icon="QRCode"
-                :size="iconSize"
-                :tooltip-delay="100"
-                t-tooltip="ribbon.wechat_official"
-                @click="openWechatOfficial" />
-            <icon-button
-                v-else
-                :border="false"
-                :icon="Twitter"
-                :size="iconSize"
-                :tooltip-delay="100"
-                t-tooltip="ribbon.follow_x"
-                @click="openX" />
             <icon-button
                 :icon="Github"
                 :size="iconSize"
